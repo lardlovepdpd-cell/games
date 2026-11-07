@@ -9,9 +9,8 @@ const fs = require("fs");
 const path = require("path");
 
 const TOKEN = process.env.TOKEN;
-const PREFIX = "";
 const COLOR = 0xffffff;
-const FILE = path.join(__dirname, "peak-data.json");
+const FILE = path.join(__dirname, "main-bank-data.json");
 
 if (!TOKEN) {
   console.error("❌ TOKEN غير موجود في متغيرات الاستضافة");
@@ -27,7 +26,7 @@ const client = new Client({
 });
 
 // ==================================
-// DATABASE
+// MAIN BANK DATABASE
 // ==================================
 
 let db = { users: {} };
@@ -80,9 +79,9 @@ function money(n) {
 function embed(title, description) {
   return new EmbedBuilder()
     .setColor(COLOR)
-    .setTitle(`Peak | ${title}`)
+    .setTitle(`MAIN | ${title}`)
     .setDescription(description)
-    .setFooter({ text: "Peak Bank • نظام البنك" })
+    .setFooter({ text: "MAIN BANK • النظام الاقتصادي" })
     .setTimestamp();
 }
 
@@ -121,7 +120,7 @@ function reply(message, title, description) {
 }
 
 // ==================================
-// MARKET DATA
+// MARKET
 // ==================================
 
 const shop = {
@@ -189,9 +188,7 @@ client.on("messageCreate", async message => {
 
   try {
 
-    // ------------------------------
     // HELP
-    // ------------------------------
 
     if (["اوامر", "الأوامر", "مساعدة", "مساعده"].includes(command)) {
       return reply(message, "الأوامر", `
@@ -214,13 +211,11 @@ client.on("messageCreate", async message => {
 \`زواجي\` • \`زواجات\` • \`زواج @عضو\` • \`طلاق\` • \`خلع\`
 
 **🛒 المتجر**
-\`متجر\` • \`سوق\` • \`شراء اسم الغرض\` • \`شراء عقار اسم العقار\`
+\`متجر\` • \`سوق\` • \`شراء\`
       `);
     }
 
-    // ------------------------------
     // BALANCE
-    // ------------------------------
 
     if (["فلوس", "رصيدي", "حسابي"].includes(command)) {
       return reply(message, "حسابك البنكي", `
@@ -234,9 +229,7 @@ client.on("messageCreate", async message => {
       `);
     }
 
-    // ------------------------------
     // SALARY
-    // ------------------------------
 
     if (command === "راتب") {
       const wait = cooldown(user, "salary", 86400000);
@@ -247,16 +240,14 @@ client.on("messageCreate", async message => {
       save();
 
       return reply(message, "راتبك وصل 💰", `
-تم إيداع راتبك في المحفظة.
+استلمت راتبك اليومي!
 
-استلمت: **500 ريال**
+**500 ريال**
 رصيدك: **${money(user.wallet)}**
       `);
     }
 
-    // ------------------------------
     // TIP
-    // ------------------------------
 
     if (command === "بخشيش") {
       const wait = cooldown(user, "tip", 3600000);
@@ -270,9 +261,7 @@ client.on("messageCreate", async message => {
       return reply(message, "بخشيش 🎁", `حصلت على **${money(amount)}** بخشيش!`);
     }
 
-    // ------------------------------
     // LUCK
-    // ------------------------------
 
     if (command === "حظ") {
       const wait = cooldown(user, "luck", 21600000);
@@ -286,9 +275,7 @@ client.on("messageCreate", async message => {
       return reply(message, "🍀 حظك اليوم", `ربحت **${money(amount)}** مجانًا!`);
     }
 
-    // ------------------------------
     // INVESTMENT
-    // ------------------------------
 
     if (command === "استثمار") {
       const amount = getAmount(args);
@@ -319,29 +306,22 @@ client.on("messageCreate", async message => {
 
 مدة الاستثمار: ساعة واحدة.
 العائد الافتراضي: 5%.
-سيعود المبلغ مع الأرباح إلى محفظتك بعد انتهاء المدة.
       `);
     }
 
-    // ------------------------------
     // TRADING
-    // ------------------------------
 
     if (command === "تداول") {
       return reply(message, "📊 سوق التداول", `
-**أسعار السوق الافتراضية**
-
 🪙 الذهب: 2,500 ريال
 💎 الألماس: 5,000 ريال
 🛢️ النفط: 1,200 ريال
 
-هذه أسعار افتراضية للتجربة داخل البوت.
+أسعار افتراضية داخل البوت.
       `);
     }
 
-    // ------------------------------
     // PROPERTY
-    // ------------------------------
 
     if (command === "عقار") {
       const list = Object.entries(properties)
@@ -356,9 +336,7 @@ ${list}
       `);
     }
 
-    // ------------------------------
     // LOAN
-    // ------------------------------
 
     if (command === "قرض") {
       if (user.debt > 0) {
@@ -375,9 +353,7 @@ ${list}
       `);
     }
 
-    // ------------------------------
     // REPAY
-    // ------------------------------
 
     if (command === "سداد") {
       const amount = getAmount(args);
@@ -404,9 +380,7 @@ ${list}
       `);
     }
 
-    // ------------------------------
     // TRANSFER
-    // ------------------------------
 
     if (command === "تحويل") {
       const target = getMention(message);
@@ -433,9 +407,7 @@ ${list}
       `);
     }
 
-    // ------------------------------
     // DONATION
-    // ------------------------------
 
     if (command === "تبرع") {
       const target = getMention(message);
@@ -461,9 +433,7 @@ ${list}
       `);
     }
 
-    // ------------------------------
     // TOP
-    // ------------------------------
 
     if (["توب", "المتصدرين", "top"].includes(command)) {
       const top = Object.entries(db.users)
@@ -484,9 +454,7 @@ ${list}
       return reply(message, "🏆 أغنى الأعضاء", lines.join("\n") || "لا يوجد أعضاء في القائمة.");
     }
 
-    // ------------------------------
-    // THEFT - NPC ONLY
-    // ------------------------------
+    // ROB
 
     if (command === "نهب") {
       const wait = cooldown(user, "rob", 7200000);
@@ -511,9 +479,7 @@ ${list}
         : "تقدر تستخدم أمر نهب الآن.");
     }
 
-    // ------------------------------
     // FREE DICE
-    // ------------------------------
 
     if (command === "نرد") {
       const dice = random(1, 6);
@@ -527,9 +493,7 @@ ${list}
       `);
     }
 
-    // ------------------------------
     // FREE LUCK GAME
-    // ------------------------------
 
     if (["قمار", "رهان"].includes(command)) {
       const outcomes = [
@@ -546,9 +510,7 @@ ${outcomes[random(0, outcomes.length - 1)]}
       `);
     }
 
-    // ------------------------------
     // FRUITS
-    // ------------------------------
 
     if (command === "فواكه") {
       const fruits = ["🍎", "🍊", "🍇", "🍉", "🍓", "🍒"];
@@ -560,9 +522,7 @@ ${random(0, 1) ? fruits.join(" ") : [...fruits].reverse().join(" ")}
       `);
     }
 
-    // ------------------------------
     // GAME
-    // ------------------------------
 
     if (command === "لعبه") {
       const number = random(1, 10);
@@ -575,9 +535,7 @@ ${random(0, 1) ? fruits.join(" ") : [...fruits].reverse().join(" ")}
       `);
     }
 
-    // ------------------------------
     // TIME
-    // ------------------------------
 
     if (command === "وقت") {
       return reply(message, "⏰ الوقت", `
@@ -586,9 +544,7 @@ ${random(0, 1) ? fruits.join(" ") : [...fruits].reverse().join(" ")}
       `);
     }
 
-    // ------------------------------
     // SHOP
-    // ------------------------------
 
     if (command === "متجر") {
       const list = Object.entries(shop)
@@ -603,9 +559,7 @@ ${list}
       `);
     }
 
-    // ------------------------------
     // MARKET
-    // ------------------------------
 
     if (command === "سوق") {
       return reply(message, "🏪 السوق", `
@@ -621,9 +575,7 @@ ${Object.entries(shop).map(([name, price]) =>
       `);
     }
 
-    // ------------------------------
     // BUY
-    // ------------------------------
 
     if (command === "شراء") {
       const parts = args.split(/\s+/);
@@ -658,9 +610,7 @@ ${Object.entries(shop).map(([name, price]) =>
       `);
     }
 
-    // ------------------------------
     // PARTNERSHIP
-    // ------------------------------
 
     if (command === "زواجي") {
       if (!user.partner) {
@@ -691,7 +641,6 @@ ${Object.entries(shop).map(([name, price]) =>
         return reply(message, "🤝 الشراكة", "أحد الطرفين لديه شراكة بالفعل.");
       }
 
-      // شراكة فريق افتراضية، وليست زواجًا رومانسيًا.
       user.partner = target.id;
       other.partner = message.author.id;
       save();
@@ -727,10 +676,10 @@ ${message.author} و ${target}
 // ==================================
 
 client.once("ready", () => {
-  console.log(`✅ Peak is online: ${client.user.tag}`);
+  console.log(`✅ MAIN BANK ONLINE: ${client.user.tag}`);
 
   client.user.setPresence({
-    activities: [{ name: "Peak Bank | ريال" }],
+    activities: [{ name: "MAIN BANK | ريال" }],
     status: "online"
   });
 });

@@ -1,6 +1,6 @@
 
 {
-  "name": "peak-bank",
+  "name": "main-bank",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {

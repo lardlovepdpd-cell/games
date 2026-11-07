@@ -1,0 +1,13 @@
+
+{
+  "name": "main-games",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "discord.js": "^14.22.1",
+    "@napi-rs/canvas": "^0.1.80"
+  }
+}
